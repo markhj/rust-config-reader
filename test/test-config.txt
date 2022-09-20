@@ -1,0 +1,7 @@
+[group]
+name = Group
+property = value
+
+[another]
+name = Another
+hello = Hello world
