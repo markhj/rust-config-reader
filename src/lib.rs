@@ -57,6 +57,7 @@ fn parse_config_file(file : BufReader<File>) -> Config {
         if regex_group.is_match(&ln) {
             grp = Some(regex_group.replace_all(&ln, "$1").to_string());
             tmp = HashMap::new();
+            continue;
         }
 
         if grp.is_none() || !regex_config.is_match(&ln) {
