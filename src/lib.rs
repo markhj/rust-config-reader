@@ -85,11 +85,11 @@ mod tests {
     fn read_file() {
         let categories = read("./test/test-config.txt").unwrap();
 
-        assert_eq!("Group", categories.get("group".to_string(), "name".to_string()).unwrap());
-        assert_eq!("Another", categories.get("another".to_string(), "name".to_string()).unwrap());
-        assert_eq!("Hello world", categories.get("another".to_string(), "hello".to_string()).unwrap());
-        assert_eq!("25", categories.get("group".to_string(), "underscore_value".to_string()).unwrap());
-        assert!(categories.get("exists".to_string(), "not".to_string()).is_err());
+        assert_eq!("Group", categories.get("group", "name").unwrap());
+        assert_eq!("Another", categories.get("another", "name").unwrap());
+        assert_eq!("Hello world", categories.get("another", "hello").unwrap());
+        assert_eq!("25", categories.get("group", "underscore_value").unwrap());
+        assert!(categories.get("exists", "not").is_err());
     }
 
     #[test]

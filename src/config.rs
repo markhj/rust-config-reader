@@ -7,14 +7,14 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn get(&self, group : String, key : String) -> Result<String, ()> {
-        if !self.map.contains_key(&group) {
+    pub fn get(&self, group : &str, key : &str) -> Result<String, ()> {
+        if !self.map.contains_key(&group.to_string()) {
             return Err(());
         }
-        let properties : &HashMap<String, String> = self.map.get(&group).unwrap();
-        if !properties.contains_key(&key) {
+        let properties : &HashMap<String, String> = self.map.get(group).unwrap();
+        if !properties.contains_key(&key.to_string()) {
             return Err(());
         }
-        return Ok(properties.get(&key).unwrap().clone());
+        return Ok(properties.get(&key.to_string()).unwrap().clone());
     }
 }
