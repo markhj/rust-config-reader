@@ -1,6 +1,11 @@
+# Comment
+
 [group]
 name = Group
+
+# A description of what this does:
 property = value
+underscore_value = 25
 
 [another]
 name = Another

@@ -41,8 +41,8 @@ pub fn read(filename : &str) -> Result<Config, ConfigReadError> {
 /// The first layer to find all groups marked with ``[group]`` in the config file.
 /// The second layer is splitting the lines with ``=``.
 fn parse_config_file(file : BufReader<File>) -> Config {
-    let regex_config = Regex::new(r"^[a-z+]+\s?=\s?.*?$").unwrap();
-    let regex_group = Regex::new(r"^\[([a-z]+)\]$").unwrap();
+    let regex_config = Regex::new(r"^[a-z][a-z_]+\s?=\s?.*?$").unwrap();
+    let regex_group = Regex::new(r"^\[([a-z][a-z_]*)\]$").unwrap();
     let mut cfg : HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut grp : Option<String> = None;
     let mut tmp : HashMap<String, String> = HashMap::new();
@@ -88,6 +88,7 @@ mod tests {
         assert_eq!("Group", categories.get("group".to_string(), "name".to_string()).unwrap());
         assert_eq!("Another", categories.get("another".to_string(), "name".to_string()).unwrap());
         assert_eq!("Hello world", categories.get("another".to_string(), "hello".to_string()).unwrap());
+        assert_eq!("25", categories.get("group".to_string(), "underscore_value".to_string()).unwrap());
         assert!(categories.get("exists".to_string(), "not".to_string()).is_err());
     }
 
