@@ -43,6 +43,7 @@ pub fn read(filename : &str) -> Result<Config, ConfigReadError> {
 fn parse_config_file(file : BufReader<File>) -> Config {
     let regex_config = Regex::new(r"^[a-z][a-z_]+\s?=\s?.*?$").unwrap();
     let regex_group = Regex::new(r"^\[([a-z][a-z_]*)\]$").unwrap();
+
     let mut cfg : HashMap<String, HashMap<String, String>> = HashMap::new();
     let mut grp : Option<String> = None;
     let mut tmp : HashMap<String, String> = HashMap::new();
@@ -50,6 +51,8 @@ fn parse_config_file(file : BufReader<File>) -> Config {
     for line in file.lines() {
         let ln : String = line.unwrap().trim().to_string();
 
+        // If we hold an existing group of key/value pairs, when we encounter
+        // a new group, we insert the content into the HashMap
         if regex_group.is_match(&ln) && grp.is_some() {
             cfg.insert(grp.clone().unwrap(), tmp.clone());
         }
@@ -69,6 +72,7 @@ fn parse_config_file(file : BufReader<File>) -> Config {
         tmp.insert(v[0].trim().to_string(), v[1].trim().to_string());
     }
 
+    // Insert the final (temp.) list of key/value pairs
     cfg.insert(grp.clone().unwrap(), tmp.clone());
 
     Config {
@@ -88,8 +92,21 @@ mod tests {
         assert_eq!("Group", categories.get("group", "name").unwrap());
         assert_eq!("Another", categories.get("another", "name").unwrap());
         assert_eq!("Hello world", categories.get("another", "hello").unwrap());
+
+        // Check the underscore character
         assert_eq!("25", categories.get("group", "underscore_value").unwrap());
+
+        // Non-existing group (as Result error)
         assert!(categories.get("exists", "not").is_err());
+
+        // Non-existing key in existing group (as Result error)
+        assert!(categories.get("group", "not").is_err());
+
+        // Check default works when group doesn't exist
+        assert_eq!("Default", categories.get_or("nogroup", "whatever", "Default"));
+
+        // Check default when a key doesn't exist in a group
+        assert_eq!("Default", categories.get_or("group", "nokey", "Default"));
     }
 
     #[test]

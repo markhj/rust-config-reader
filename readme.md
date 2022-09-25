@@ -1,7 +1,7 @@
 ## What is this?
 This Crate is used to read a configuration file on the example form:
 
-````rust
+````
 [server]
 port = 1234
 host = localhost
