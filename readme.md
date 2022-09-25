@@ -51,3 +51,23 @@ an ``Err`` when it cannot find a key/value pair, returns a fallback/default valu
 ````rust
 let port : String = cfg.get_or("server", "port", "1234");
 ````
+
+## Full example
+my-config-file:
+````
+[server]
+port = 1234
+````
+
+.rs file:
+````rust
+use rust_config_reader::read;
+
+let reader = read("my-config-file").expect("Config file not found");
+
+// Panic when missing config:
+let port = reader.get("server", "port").expect("Port must be specified");
+
+// Gracefully use a default value:
+let host = reader.get_or("server", "host", "127.0.0.1");
+````
