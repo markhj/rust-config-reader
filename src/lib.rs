@@ -8,8 +8,9 @@ use std::{
     collections::HashMap,
 };
 use regex::Regex;
-use crate::config_read_error::{*, ConfigReadError::*};
-use crate::config::Config;
+
+pub use crate::config_read_error::{*, ConfigReadError::*};
+pub use crate::config::Config;
 
 mod config_read_error;
 mod config;
