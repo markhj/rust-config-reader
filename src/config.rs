@@ -3,7 +3,7 @@ use std::collections::HashMap;
 /// # Config struct
 /// The Configuration struct which implements the `´get`` and ``get_or``
 /// functions, and the HashMap of groups and subsequent key/value pairs
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub map: HashMap<String, HashMap<String, String>>,
 }
