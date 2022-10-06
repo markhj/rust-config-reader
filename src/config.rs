@@ -30,4 +30,24 @@ impl Config {
     pub fn get_or(&self, group : &str, key : &str, fallback : &str) -> String {
         self.get(group, key).unwrap_or(fallback.to_string())
     }
+
+    /// # Groups
+    /// Returns the a ``Vec<String>`` of the groups in the config file
+    pub fn groups(&self) -> Vec<String> {
+        let mut keys: Vec<String> = Vec::new();
+        for x in &self.map {
+            keys.insert(0, x.0.to_string());
+        }
+        keys
+    }
+
+    /// # Keys
+    /// Returns the a ``Vec<String>`` of keys found in a specific group
+    pub fn keys(&self, group: &str) -> Vec<String> {
+        let mut keys: Vec<String> = Vec::new();
+        for x in self.map.get(group).unwrap().keys() {
+            keys.insert(0, x.to_string());
+        }
+        keys
+    }
 }

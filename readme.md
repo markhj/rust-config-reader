@@ -79,3 +79,19 @@ let port = reader.get("server", "port").expect("Port must be specified");
 // Gracefully use a default value:
 let host = reader.get_or("server", "host", "127.0.0.1");
 ````
+
+## Other methods
+
+### groups
+````rust
+pub fn groups() -> Vec<String>
+````
+
+Returns a ``Vec<String>`` collection of the groups found in the configuration file.
+
+### keys
+````rust
+pub fn keys(group: &str) -> Vec<String>
+````
+
+Returns a ``Vec<String>`` collection of the keys found in a specified group

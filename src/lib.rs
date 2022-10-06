@@ -87,6 +87,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn keys() {
+        let categories = read("./test/test-config.txt").unwrap();
+        let keys: Vec<String> = categories.keys("group");
+
+        assert!(keys.contains(&"property".to_string()));
+        assert!(keys.contains(&"underscore_value".to_string()));
+        assert!(keys.contains(&"name".to_string()));
+        assert_eq!(3, keys.len());
+    }
+
+    #[test]
+    fn groups() {
+        let categories = read("./test/test-config.txt").unwrap();
+        let keys: Vec<String> = categories.groups();
+
+        assert!(keys.contains(&"group".to_string()));
+        assert!(keys.contains(&"another".to_string()));
+        assert_eq!(2, keys.len());
+    }
+
+    #[test]
     fn read_file() {
         let categories = read("./test/test-config.txt").unwrap();
 
