@@ -21,7 +21,7 @@ impl Config {
     /// This function returns ``GroupNotFound`` as result error, when the group doesn't exist.
     /// It returns ``KeyInGroupNotFound`` when a key doesn't exist in a group
     pub fn get(&self, group: &str, key: &str) -> Result<String, ConfigReadError> {
-        if !self.map.contains_key(&group.to_string()) {
+        if !self.has_group(group) {
             return Err(GroupNotFound);
         }
         let properties: &HashMap<String, String> = self.map.get(group).unwrap();
@@ -49,5 +49,12 @@ impl Config {
     /// Returns a ``Vec<String>`` collection of keys found in a specified group
     pub fn keys(&self, group: &str) -> Vec<String> {
         Vec::from_iter(self.map.get(group).unwrap().keys().map(|e: &String| e.to_string()))
+    }
+
+    /// # has_group
+    /// Returns true if the group exists in the config file
+    /// The ``group`` parameters is case-sensitive
+    pub fn has_group(&self, group: &str) -> bool {
+        self.map.contains_key(&group.to_string())
     }
 }

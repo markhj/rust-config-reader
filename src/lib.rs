@@ -87,6 +87,13 @@ mod tests {
     use super::*;
 
     #[test]
+    fn has_group() {
+        let categories = read("./test/test-config.txt").unwrap();
+        assert!(categories.has_group("group"));
+        assert!(!categories.has_group("non_existing"));
+    }
+
+    #[test]
     fn keys() {
         let categories = read("./test/test-config.txt").unwrap();
         let keys: Vec<String> = categories.keys("group");

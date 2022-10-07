@@ -95,3 +95,11 @@ pub fn keys(group: &str) -> Vec<String>
 ````
 
 Returns a ``Vec<String>`` collection of the keys found in a specified group
+
+### has_group
+````rust
+pub fn has_group(group: &str) -> bool
+````
+
+Returns true, if the group exists in the config file.
+Note that ``group`` argument is case-sensitive.
