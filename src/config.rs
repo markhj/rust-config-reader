@@ -32,22 +32,14 @@ impl Config {
     }
 
     /// # Groups
-    /// Returns the a ``Vec<String>`` of the groups in the config file
+    /// Returns the a ``Vec<String>`` collection containing the groups in the config file
     pub fn groups(&self) -> Vec<String> {
-        let mut keys: Vec<String> = Vec::new();
-        for x in &self.map {
-            keys.insert(0, x.0.to_string());
-        }
-        keys
+        Vec::from_iter(self.map.keys().map(|e: &String| e.to_string()))
     }
 
     /// # Keys
     /// Returns the a ``Vec<String>`` of keys found in a specific group
     pub fn keys(&self, group: &str) -> Vec<String> {
-        let mut keys: Vec<String> = Vec::new();
-        for x in self.map.get(group).unwrap().keys() {
-            keys.insert(0, x.to_string());
-        }
-        keys
+        Vec::from_iter(self.map.get(group).unwrap().keys().map(|e: &String| e.to_string()))
     }
 }
