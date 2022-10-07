@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use crate::ConfigReadError;
-use ConfigReadError::{
+use crate::ConfigReadError::{
+    self,
     GroupNotFound,
     KeyInGroupNotFound,
 };
@@ -40,13 +40,13 @@ impl Config {
     }
 
     /// # Groups
-    /// Returns the a ``Vec<String>`` collection containing the groups in the config file
+    /// Returns a ``Vec<String>`` collection containing the groups in the config file
     pub fn groups(&self) -> Vec<String> {
         Vec::from_iter(self.map.keys().map(|e: &String| e.to_string()))
     }
 
     /// # Keys
-    /// Returns the a ``Vec<String>`` of keys found in a specific group
+    /// Returns a ``Vec<String>`` collection of keys found in a specified group
     pub fn keys(&self, group: &str) -> Vec<String> {
         Vec::from_iter(self.map.get(group).unwrap().keys().map(|e: &String| e.to_string()))
     }
