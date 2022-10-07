@@ -21,9 +21,8 @@ mod config;
 ///
 /// If the file doesn't exist ***ConfigReadError*** will be
 /// returned in the result.
-pub fn read(filename : &str) -> Result<Config, ConfigReadError> {
-    let path : &Path = Path::new(filename);
-
+pub fn read(filename: &str) -> Result<Config, ConfigReadError> {
+    let path: &Path = Path::new(filename);
     if !path.exists() {
         return Err(FileNotFound);
     }
@@ -41,13 +40,13 @@ pub fn read(filename : &str) -> Result<Config, ConfigReadError> {
 ///
 /// The first layer to find all groups marked with ``[group]`` in the config file.
 /// The second layer is splitting the lines with ``=``.
-fn parse_config_file(file : BufReader<File>) -> Config {
-    let regex_config = Regex::new(r"^[a-z][a-z_]+\s?=\s?.*?$").unwrap();
-    let regex_group = Regex::new(r"^\[([a-z][a-z_]*)\]$").unwrap();
+fn parse_config_file(file: BufReader<File>) -> Config {
+    let regex_config: Regex = Regex::new(r"^[a-z][a-z_]+\s?=\s?.*?$").unwrap();
+    let regex_group: Regex = Regex::new(r"^\[([a-z][a-z_]*)\]$").unwrap();
 
-    let mut cfg : HashMap<String, HashMap<String, String>> = HashMap::new();
-    let mut grp : Option<String> = None;
-    let mut tmp : HashMap<String, String> = HashMap::new();
+    let mut cfg: HashMap<String, HashMap<String, String>> = HashMap::new();
+    let mut grp: Option<String> = None;
+    let mut tmp: HashMap<String, String> = HashMap::new();
 
     for line in file.lines() {
         let ln : String = line.unwrap().trim().to_string();
@@ -62,15 +61,13 @@ fn parse_config_file(file : BufReader<File>) -> Config {
             grp = Some(regex_group.replace_all(&ln, "$1").to_string());
             tmp = HashMap::new();
             continue;
-        }
-
-        if grp.is_none() || !regex_config.is_match(&ln) {
+        } else if grp.is_none() || !regex_config.is_match(&ln) {
             continue;
         }
 
-        let v : Vec<&str> = ln.split("=").collect();
+        let pair: Vec<&str> = ln.split("=").collect();
 
-        tmp.insert(v[0].trim().to_string(), v[1].trim().to_string());
+        tmp.insert(pair[0].trim().to_string(), pair[1].trim().to_string());
     }
 
     // Insert the final (temp.) list of key/value pairs
