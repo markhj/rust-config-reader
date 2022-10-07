@@ -108,6 +108,22 @@ mod tests {
     }
 
     #[test]
+    fn group_not_found() {
+        assert_eq!(
+            GroupNotFound,
+            read("./test/test-config.txt").unwrap().get("fake_group", "hello").err().unwrap()
+        );
+    }
+
+    #[test]
+    fn key_in_group_not_found() {
+        assert_eq!(
+            KeyInGroupNotFound,
+            read("./test/test-config.txt").unwrap().get("group", "hello").err().unwrap()
+        );
+    }
+
+    #[test]
     fn read_file() {
         let categories = read("./test/test-config.txt").unwrap();
 
