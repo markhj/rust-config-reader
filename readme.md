@@ -18,7 +18,7 @@ another = 4321
 And accessing the properties as simply as:
 
 ````rust
-let cfg: Config = read("config-file.txt", None).unwrap();
+let cfg: Config = ConfigReader::read("config-file.txt", None).unwrap();
 let host: String = cfg.group("server").unwrap().get_or("host", "localhost"); 
 ````
 
@@ -35,9 +35,9 @@ Use the ``read`` function to retrieve the parsed ``Config`` struct, which
 is the object you'll interact with to get configuration items.
 
 ````rust
-use rust_config_reader::read;
+use rust_config_reader::ConfigReader;
 
-let reader = read("my-config-file", None).expect("Config file not found");
+let reader = ConfigReader::read("my-config-file", None).expect("Config file not found");
 ````
 
 If the file does not exist, an ``Err`` is returned. In the example above, we

@@ -67,25 +67,29 @@ pub fn get_default_options() -> Options {
     }
 }
 
-/// # Read configuration file
-/// This function will attempt to load the specified
-/// configuration file as given in **filename**.
-///
-/// If the file doesn't exist ``ConfigReadError::FileNotFound`` will be
-/// returned in the result.
-pub fn read(filename: &str, options: Option<Options>) -> Result<Config, ConfigReadError> {
-    let opts: Options = options.unwrap_or(get_default_options());
+pub struct ConfigReader;
 
-    let path: &Path = Path::new(filename);
-    if !path.exists() {
-        return Err(FileNotFound);
+impl ConfigReader {
+    /// # Read configuration file
+    /// This function will attempt to load the specified
+    /// configuration file as given in **filename**.
+    ///
+    /// If the file doesn't exist ``ConfigReadError::FileNotFound`` will be
+    /// returned in the result.
+    pub fn read(filename: &str, options: Option<Options>) -> Result<Config, ConfigReadError> {
+        let opts: Options = options.unwrap_or(get_default_options());
+
+        let path: &Path = Path::new(filename);
+        if !path.exists() {
+            return Err(FileNotFound);
+        }
+
+        let reader = BufReader::new(
+            File::open(path).expect("Cannot open config file")
+        );
+
+        parse_config_file(reader, &opts)
     }
-
-    let reader = BufReader::new(
-        File::open(path).expect("Cannot open config file")
-    );
-
-    parse_config_file(reader, &opts)
 }
 
 /// # Line syntax regular expressions
@@ -213,14 +217,14 @@ mod tests {
     fn invalid_file_syntax() {
         assert_eq!(
             Err(InvalidSyntaxOnLine),
-            read("./test/test-config-invalid-syntax.txt", None)
+            ConfigReader::read("./test/test-config-invalid-syntax.txt", None)
         );
     }
 
     #[test]
     fn string_strictness_loose() {
         // The default configuration is ``Loose``
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config =  ConfigReader::read("./test/test-config.txt", None).unwrap();
 
         assert!(cfg.group("strict").unwrap().get("one_word").is_some());
         assert_eq!("Hello world", cfg.group("strict").unwrap().get("in_quotes").unwrap().value);
@@ -232,7 +236,7 @@ mod tests {
         let mut opts: Options = get_default_options();
         opts.string_strictness = Forgivable;
 
-        let cfg: Config = read("./test/test-config.txt", Some(opts)).unwrap();
+        let cfg: Config =  ConfigReader::read("./test/test-config.txt", Some(opts)).unwrap();
 
         assert!(cfg.group("strict").unwrap().get("one_word").is_some());
         assert_eq!("Hello world", cfg.group("strict").unwrap().get("in_quotes").unwrap().value);
@@ -244,7 +248,7 @@ mod tests {
         let mut opts: Options = get_default_options();
         opts.string_strictness = Very;
 
-        let cfg: Config = read("./test/test-config.txt", Some(opts)).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", Some(opts)).unwrap();
 
         assert!(cfg.group("strict").unwrap().get("one_word").is_none());
         assert_eq!("Hello world", cfg.group("strict").unwrap().get("in_quotes").unwrap().value);
@@ -253,12 +257,12 @@ mod tests {
 
     #[test]
     fn file_not_found() {
-        assert!(read("doesnt-exist.txt", None).is_err());
+        assert!(ConfigReader::read("doesnt-exist.txt", None).is_err());
     }
 
     #[test]
     fn get() {
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", None).unwrap();
         assert_eq!("value", cfg.group("group").unwrap().get("property").unwrap().value);
         assert_eq!("25", cfg.group("group").unwrap().get("underscore_value").unwrap().value);
         assert_eq!("Hello world", cfg.group("another").unwrap().get("hello").unwrap().value);
@@ -269,32 +273,32 @@ mod tests {
 
     #[test]
     fn group_not_existing() {
-        assert!(read("./test/test-config.txt", None).unwrap().group("nope").is_none());
+        assert!(ConfigReader::read("./test/test-config.txt", None).unwrap().group("nope").is_none());
     }
 
     #[test]
     fn get_or() {
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", None).unwrap();
         assert_eq!("fallback", cfg.group("group").unwrap().get_or("nope", "fallback"))
     }
 
     #[test]
     fn has_group() {
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", None).unwrap();
         assert!(cfg.has_group("group"));
         assert!(!cfg.has_group("non_existing"));
     }
 
     #[test]
     fn group_has_key() {
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", None).unwrap();
         assert!(cfg.group("group").unwrap().has("name"));
         assert!(!cfg.group("group").unwrap().has("nope"));
     }
 
     #[test]
     fn keys() {
-        let cfg: Config = read("./test/test-config.txt", None).unwrap();
+        let cfg: Config = ConfigReader::read("./test/test-config.txt", None).unwrap();
         let keys: Vec<String> = cfg.group("group").unwrap().keys();
 
         assert!(keys.contains(&"property".to_string()));
@@ -305,7 +309,7 @@ mod tests {
 
     #[test]
     fn for_each_group() {
-        read("./test/test-config.txt", None)
+        ConfigReader::read("./test/test-config.txt", None)
             .unwrap()
             .for_each_group(|_key: &str, _group: &Group| {
 
@@ -314,7 +318,7 @@ mod tests {
 
     #[test]
     fn for_each() {
-        read("./test/test-config.txt", None)
+        ConfigReader::read("./test/test-config.txt", None)
             .unwrap()
             .group("group")
             .unwrap()
@@ -325,7 +329,7 @@ mod tests {
 
     #[test]
     fn typecasting() {
-        let cfg = read("./test/test-config.txt", None).unwrap();
+        let cfg = ConfigReader::read("./test/test-config.txt", None).unwrap();
         let item = cfg.group("group").unwrap().get("underscore_value").unwrap();
 
         assert_eq!(String::from("25"), item.get());
@@ -340,7 +344,7 @@ mod tests {
 
     #[test]
     fn bools() {
-        let cfg = read("./test/test-config.txt", None).unwrap();
+        let cfg = ConfigReader::read("./test/test-config.txt", None).unwrap();
         let bools = cfg.group("bools").unwrap();
 
         let true_vals: [&str; 4] = ["one", "true", "on", "yes"];
