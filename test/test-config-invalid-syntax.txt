@@ -1,0 +1,6 @@
+# Comment
+
+[group]
+name = Group
+
+This is an invalid line

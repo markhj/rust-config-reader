@@ -33,7 +33,7 @@ is the object you'll interact with, in order to get configuration items.
 ````rust
 use rust_config_reader::read;
 
-let reader = read("my-config-file").expect("Config file not found");
+let reader = read("my-config-file", None).expect("Config file not found");
 ````
 
 If the file does not exist, an ``Err`` is returned. In the example above, we
@@ -87,7 +87,7 @@ port = 1234
 ````rust
 use rust_config_reader::read;
 
-let reader = read("my-config-file").expect("Config file not found");
+let reader = read("my-config-file", None).expect("Config file not found");
 let server_group = reader.group("server").expect("[server] group not defined");
 
 // Panic when missing config:
@@ -161,8 +161,78 @@ pub fn has(key: &str)
 ````
 Returns true, if the ``key`` exists in the group.
 
-# Roadmap
+# Options
+You can configure the behavior of the configuration file parser by injecting an instance of the ``Options`` struct into the
+``read`` function. You may have noticed in the examples that we injected ``None`` as second parameter.
+This means we use the default configuration.
 
-* Type-casting in ``ConfigurationItem``
-* Improve code structure in ``read`` function
-* Option to require stricter formats in the configuration file
+Example usage:
+````rust
+let mut options = get_default_options;
+options.string_strictness = Forigvable;
+let cfg: Config = read("file.txt", options).unwrap();
+````
+
+The advantage to using the ``get_default_options`` function is that it provides the full struct
+with all defined keys. You can, of course, set everything up yourself, but it would become a tedious process.
+
+| Key |         Values          | Default | Description |
+| :---:|:-----------------------:|:-------:| :---: |
+| ``string_strictness`` | Loose, Forgivable, Very |  Loose  | Determines how string values are handled. ``Loose`` will never require quotation marks. ``Forgivable`` will allow omission of quotation marks on strings without whitespaces. ``Very`` will always require quotation marks. |
+| ``string_strictness_behavior`` | Ignore, Panic | Ignore | Describes what happens when an invalid string is encountered. ``Ignore`` means the configuration item is dropped from consideration. ``Panic`` will, as the name implies, do a ``panic!`` with reference to the invalid line.
+
+# Type casting
+
+Values from the configuration file are always returned as ``String``.
+But you can easily cast configuration items as a range of primitive data types.
+
+Usage:
+````rust
+let port: i32 = cfg.group("server").unwrap().get("port").unwrap().as_i32();
+````
+
+All methods:
+
+````rust
+pub fn as_str()
+pub fn as_i32()
+pub fn as_u32()
+pub fn as_f32()
+pub fn as_i64()
+pub fn as_u64()
+pub fn as_f64()
+````
+
+## as_bool
+
+The ``as_bool`` and ``as_bool_grf`` methods provides an easy short-hand to read a value as boolean.
+
+These values will be mapped to ``true``:
+* 1
+* true
+* on
+* yes
+
+And on the contrary these values will be mapped to ``false``:
+* 0
+* false
+* off
+* no
+
+Any other provided value will cause the ``Err`` of type ``InvalidBoolValue`` to be returned.
+
+You can use the method ``as_bool_grf`` to gracefully interpret invalid syntax as false.
+
+### Example
+
+Config file:
+````
+[server]
+root_login = on
+````
+
+Rust file:
+````rust
+let root_login: bool = cfg.group("server").unwrap().get("root_login").unwrap().as_bool().unwrap();
+````
+

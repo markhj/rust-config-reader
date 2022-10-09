@@ -1,11 +1,12 @@
 use std::collections::HashMap;
-use crate::Group;
+use crate::{ConfigurationItem, Group};
 
 /// # Config struct
 /// The ``Config`` struct provides access to the parsed configuration file
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Config {
     pub map: HashMap<String, Group>,
+    pub cursor: Option<String>,
 }
 
 impl Config {
@@ -17,6 +18,28 @@ impl Config {
             true => Some(self.map.get(group).unwrap().clone()),
             _ => None,
         }
+    }
+
+    /// # Insert
+    /// Insert ConfigurationItem into the latest added group
+    pub fn insert(&mut self, val: ConfigurationItem) {
+        let group: &String = self.cursor.as_ref().unwrap();
+        if self.has_group(&group) {
+            let mut grp = self.map.get(group.as_str()).unwrap().clone();
+            grp.pairs.insert(val.key.to_string(), val);
+            self.map.insert(group.clone(), grp.clone());
+        }
+    }
+
+    /// # Add group
+    /// Insert a new group into the ``Config`` instance.
+    /// This is mostly used by the internal parser functions, but can also be
+    /// used in real-life use-cases.
+    pub fn add_group(&mut self, name: String) {
+        self.cursor = Some(name.clone());
+        self.map.insert(name.to_string(), Group {
+            pairs: HashMap::new(),
+        });
     }
 
     /// # For each group

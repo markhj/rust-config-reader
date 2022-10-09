@@ -10,3 +10,19 @@ underscore_value = 25
 [another]
 name = Another
 hello = Hello world
+
+[strict]
+one_word = WordWithoutSpaces
+in_quotes = "Hello world"
+no_quotes = Hello world
+
+[bools]
+one = 1
+true = true
+yes = yes
+on = on
+zero = 0
+false = false
+no = no
+off = off
+invalid = invalid syntax

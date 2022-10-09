@@ -8,4 +8,15 @@ pub enum ConfigReadError {
     /// ``Err`` type returned when the specified configuration file doesn't exist,
     /// or isn't found where expected
     FileNotFound,
+
+    /// Invalid syntax on line
+    ///
+    /// One or more lines in the configuration file has an invalid syntax, i.e.
+    /// it's not a comment, not a group title or a configuration item
+    InvalidSyntaxOnLine,
+}
+
+#[derive(Debug)]
+pub enum ConfigValueError {
+    InvalidBoolValue,
 }

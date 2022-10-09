@@ -1,3 +1,3 @@
-pub(crate) mod config_read_error;
+pub(crate) mod errors;
 pub(crate) mod config;
 pub(crate) mod group;
