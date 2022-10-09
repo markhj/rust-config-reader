@@ -1,3 +1,7 @@
+# rust-config-reader
+[![Minimum rustc version](https://img.shields.io/badge/rustc-1.63+-lightgray.svg)](https://github.com/markhj/rust-config-reader)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 ## What is this?
 This Crate is used to read a configuration file on the example form:
 
