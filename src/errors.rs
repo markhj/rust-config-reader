@@ -16,7 +16,10 @@ pub enum ConfigReadError {
     InvalidSyntaxOnLine,
 }
 
+/// # Errors in configuration values
 #[derive(Debug)]
 pub enum ConfigValueError {
+    /// An InvalidBoolValue is when the configuration value is none of the following:
+    /// 1, 0, true, false, on, off, yes, no
     InvalidBoolValue,
 }

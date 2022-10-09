@@ -14,7 +14,7 @@ another = 4321
 And accessing the properties as simply as:
 
 ````rust
-let cfg: Config = read("config-file.txt").unwrap();
+let cfg: Config = read("config-file.txt", None).unwrap();
 let host: String = cfg.group("server").unwrap().get_or("host", "localhost"); 
 ````
 
@@ -27,8 +27,8 @@ git = "https://github.com/markhj/rust-config-reader"
 ````
 
 ## Usage
-Import the ``read`` method, in order to retrieve the parsed ``Config`` struct, which
-is the object you'll interact with, in order to get configuration items.
+Use the ``read`` function to retrieve the parsed ``Config`` struct, which
+is the object you'll interact with to get configuration items.
 
 ````rust
 use rust_config_reader::read;
@@ -40,15 +40,15 @@ If the file does not exist, an ``Err`` is returned. In the example above, we
 immediately ``panic`` upon encountering this error. You can go a different route, and for example build a default
 config file, when catching this error.
 
-Once the ``Config`` struct is successfully loaded, we can start reading the contents.
+Once the ``Config`` struct is successfully loaded, we can read its content.
 
 ### Accessing configuration items
-The first step is to access a group of items. This is achieved with the ``group`` method:
+The first step is to access a _**group**_ of items. This is (not surprisingly) achieved with the ``group`` method:
 
 ````rust
 pub fn group(group: &str) -> Option<Group>
 ````
-It returns an ``Option``, which will be ``None`` in case the group doesn't exist.
+It returns an ``Option``. It will be ``None`` in case the group doesn't exist.
 With the ``Group`` struct you can retrieve configuration items by key.
 
 Imagine this configuration file:
@@ -57,22 +57,22 @@ Imagine this configuration file:
 port = 1234
 ````
 
-We can retrieve the ``port`` value by doing this:
+We can retrieve the "port" value by doing this:
 ````rust
 let port = reader.group("server").unwrap().get("port").unwrap().value;
 ````
 
-In this example we uncritically try to unwrap the returned options.
-In your real-world application you might want to approach this differently.
+In this example, we uncritically try to unwrap the returned options.
+In your real-world application you might want to approach this more gracefully.
 
-To gracefully use a default/fallback value when a configuration isn't defined, is to use
-the ``get_or`` method.
+One graceful approach is to get a default/fallback value when a configuration isn't defined.
+For this, you can use the ``get_or`` function.
 
 ````rust
 let port = reader.group("server").unwrap().get_or("port", "8080");
 ````
 
-You'll notice there's no unwrapping in this case. This is because the error handling for
+You'll notice there's no unwrapping in this case. That's because the error handling for
 when the configuration item doesn't exist, is handled implicitly by returning a default value.
 Hence, there's no need for an ``Option`` struct.
 
@@ -166,7 +166,7 @@ You can configure the behavior of the configuration file parser by injecting an 
 ``read`` function. You may have noticed in the examples that we injected ``None`` as second parameter.
 This means we use the default configuration.
 
-Example usage:
+Example use, where we change the strictness of string value interpretations:
 ````rust
 let mut options = get_default_options;
 options.string_strictness = Forigvable;
@@ -174,7 +174,7 @@ let cfg: Config = read("file.txt", options).unwrap();
 ````
 
 The advantage to using the ``get_default_options`` function is that it provides the full struct
-with all defined keys. You can, of course, set everything up yourself, but it would become a tedious process.
+with all defined keys. You can, of course, set everything up yourself, but it could become tedious.
 
 | Key |         Values          | Default | Description |
 | :---:|:-----------------------:|:-------:| :---: |
@@ -205,7 +205,7 @@ pub fn as_f64()
 
 ## as_bool
 
-The ``as_bool`` and ``as_bool_grf`` methods provides an easy short-hand to read a value as boolean.
+The ``as_bool`` and ``as_bool_grf`` methods provide easy short-hands to read values as boolean.
 
 These values will be mapped to ``true``:
 * 1
